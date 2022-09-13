@@ -6,7 +6,7 @@ MODE=${1:-'mesh'}
 
 help() {
     echo "部署calico网络插件"
-    echo "usage: calico_setup.sh [mess|rr]"
+    echo "usage: sudo ./calico_setup.sh [mesh|rr]"
     echo "默认为full-mesh模式"
 }
 
@@ -26,12 +26,14 @@ docker cp ${CURDIR}/calicoctl dev-worker3:/usr/local/bin/calicoctl
 rm -f ${CURDIR}/calicoctl
 
 curl https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico-typha.yaml -o calico.yaml
-sed -ic "s/              value: \"Always\"/              value: \"Nerver\"/g" calico.yaml
-sed -ic "s/            # - name: CALICO_IPV4POOL_CIDR/            - name: CALICO_IPV4POOL_CIDR/g" calico.yaml
-sed -ic "s/            #   value: \"192.168.0.0\/16\"/              value: \"10.224.0.0\/16\"/g" calico.yaml
+sed -i "s/            # - name: CALICO_IPV4POOL_CIDR/            - name: CALICO_IPV4POOL_CIDR/g" calico.yaml
+sed -i "s/            #   value: \"192.168.0.0\/16\"/              value: \"10.224.0.0\/16\"/g" calico.yaml
+
+if [[ "${MODE}" == "rr" ]]; then
+sed -i "s/              value: \"Always\"/              value: \"Nerver\"/g" calico.yaml
+fi
 
 kubectl apply -f ${CURDIR}/calico.yaml
-
 
 if [[ "${MODE}" == "rr" ]]; then
 
@@ -64,10 +66,10 @@ sleep 180
 
 kubectl label node dev-control-plane route-reflector=true
 
+fi
+
 docker exec -it dev-control-plane /usr/local/bin/calicoctl create -f /root/bgpconfiguration.yaml
 docker exec -it dev-control-plane /usr/local/bin/calicoctl create -f /root/bgppeer.yaml
-
-fi
 
 echo "Calico CNI Plugin Deployed..."
 
