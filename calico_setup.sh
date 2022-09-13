@@ -66,11 +66,13 @@ sleep 180
 
 kubectl label node dev-control-plane route-reflector=true
 
-fi
-
 docker exec -it dev-control-plane /usr/local/bin/calicoctl create -f /root/bgpconfiguration.yaml
 docker exec -it dev-control-plane /usr/local/bin/calicoctl create -f /root/bgppeer.yaml
 
+rm -f ${CURDIR}/bgppeer.yaml ${CURDIR}/bgpconfiguration.yaml
+
+fi
+
 echo "Calico CNI Plugin Deployed..."
 
-rm -f ${CURDIR}/calico.yaml ${CURDIR}/bgppeer.yaml ${CURDIR}/bgpconfiguration.yaml
+rm -f ${CURDIR}/calico.yaml
