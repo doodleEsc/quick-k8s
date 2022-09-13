@@ -14,17 +14,9 @@ if [[ "${KUBE_PROXY_MODE}" != "iptables" && "${KUBE_PROXY_MODE}" != "ipvs" && "$
     exit 1
 fi
 
-# local insecure registry
-reg_name='registry.dev.local'
-reg_port='5000'
-
 cat << EOF | kind create cluster --name dev --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
-containerConfigPatches:
-- |-
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.dev.local:${reg_port}"]
-    endpoint = ["http://${reg_name}:5000"]
 networking:
   apiServerAddress: "127.0.0.1"
   apiServerPort: 6443
@@ -64,21 +56,7 @@ nodes:
   - role: worker
 EOF
 
-if [ "$(docker inspect -f='{{json .NetworkSettings.Networks.kind}}' "${reg_name}")" = 'null' ]; then
-  docker network connect "kind" "${reg_name}"
-fi
-
-cat << EOF | kubectl apply -f -
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: local-registry-hosting
-  namespace: kube-public
-data:
-  localRegistryHosting.v1: |
-    host: "registry.dev.local:${reg_port}"
-    help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
-EOF
+sleep 10
 
 mkdir cni-plugins \
 && wget -O ./cni-plugins/cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/v1.1.1/cni-plugins-linux-amd64-v1.1.1.tgz \
