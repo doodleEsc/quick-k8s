@@ -22,7 +22,7 @@ tar xzvfC hubble-linux-${HUBBLE_ARCH}.tar.gz ${CURDIR}/
 docker cp ${CURDIR}/hubble dev-control-plane:/usr/local/bin/hubble
 rm hubble-linux-${HUBBLE_ARCH}.tar.gz{,.sha256sum} hubble
 
-KIND_CIDR=$(docker inspect -f '{(index .IPAM.Config 0).Subnet}' kind)
+KIND_CIDR=$(docker inspect -f '{{(index .IPAM.Config 0).Subnet}}' kind)
 
 helm repo add cilium https://helm.cilium.io/
 
