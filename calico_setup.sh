@@ -43,7 +43,7 @@ kind: BGPConfiguration
 metadata:
   name: default
 spec:
-  logServerityScreen: Info
+  logSeverityScreen: Info
   nodeToNodeMeshEnabled: false
   asNumber: 64512
 EOF
