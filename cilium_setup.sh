@@ -27,7 +27,7 @@ KIND_CIDR=$(docker inspect -f '{(index .IPAM.Config 0).Subnet}' kind)
 helm repo add cilium https://helm.cilium.io/
 
 helm install cilium cilium/cilium --version 1.12.1 \
-    --namespace kube-system
+    --namespace kube-system \
     --set tunnel=disabled \
     --set image.pullPolicy=IfNotPresent \
     --set ipam.mode=kubernetes \
