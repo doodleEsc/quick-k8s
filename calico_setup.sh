@@ -30,7 +30,7 @@ sed -i "s/            # - name: CALICO_IPV4POOL_CIDR/            - name: CALICO_
 sed -i "s/            #   value: \"192.168.0.0\/16\"/              value: \"10.224.0.0\/16\"/g" calico.yaml
 
 if [[ "${MODE}" == "rr" ]]; then
-sed -i "s/              value: \"Always\"/              value: \"Nerver\"/g" calico.yaml
+sed -i "s/              value: \"Always\"/              value: \"Never\"/g" calico.yaml
 fi
 
 kubectl apply -f ${CURDIR}/calico.yaml
