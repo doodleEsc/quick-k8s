@@ -37,7 +37,7 @@ helm install cilium cilium/cilium --version 1.12.1 \
     --set autoDirectNodeRoutes=true \
     --set localRedirectPolicy=true \
     --set ipv4NativeRoutingCIDR=${KIND_CIDR} \
-    --set ipam.operator.clusterPoolIpv4PodCIDR=10.244.0.0/16 \
+    --set ipam.operator.clusterPoolIPv4PodCIDR=10.244.0.0/16 \
     --set cgroup.hostRoot=/sys/fs/cgroup \
     --set nodePort.enabled=true \
     --set socketLB.enabled=true \
