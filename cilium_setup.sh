@@ -33,7 +33,7 @@ helm install cilium cilium/cilium --version 1.12.1 \
     --set ipam.mode=kubernetes \
     --set kubeProxyReplacement=strict \
     --set k8sServiceHost=dev-control-plane \
-    --set k8sServiceHost=6443 \
+    --set k8sServicePort=6443 \
     --set autoDirectNodeRoutes=true \
     --set localRedirectPolicy=true \
     --set ipv4NativeRoutingCIDR=${KIND_CIDR} \
