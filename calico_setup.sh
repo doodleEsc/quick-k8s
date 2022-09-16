@@ -26,11 +26,23 @@ docker cp ${CURDIR}/calicoctl dev-worker3:/usr/local/bin/calicoctl
 rm -f ${CURDIR}/calicoctl
 
 curl https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico-typha.yaml -o calico.yaml
-sed -i "s/            # - name: CALICO_IPV4POOL_CIDR/            - name: CALICO_IPV4POOL_CIDR/g" calico.yaml
-sed -i "s/            #   value: \"192.168.0.0\/16\"/              value: \"10.224.0.0\/16\"/g" calico.yaml
+
+if [[ "$(uname)" == "Darwin" ]];
+then
+    sed -i "" "s/            # - name: CALICO_IPV4POOL_CIDR/            - name: CALICO_IPV4POOL_CIDR/g" calico.yaml
+    sed -i "" "s/            #   value: \"192.168.0.0\/16\"/              value: \"10.224.0.0\/16\"/g" calico.yaml
+else
+    sed -i "s/            # - name: CALICO_IPV4POOL_CIDR/            - name: CALICO_IPV4POOL_CIDR/g" calico.yaml
+    sed -i "s/            #   value: \"192.168.0.0\/16\"/              value: \"10.224.0.0\/16\"/g" calico.yaml
+fi
 
 if [[ "${MODE}" == "rr" ]]; then
-sed -i "s/              value: \"Always\"/              value: \"Never\"/g" calico.yaml
+    if [[ "$(uname)" == "Darwin" ]];
+    then
+        sed -i "" "s/              value: \"Always\"/              value: \"Never\"/g" calico.yaml
+    else
+        sed -i "s/              value: \"Always\"/              value: \"Never\"/g" calico.yaml
+    fi
 fi
 
 kubectl apply -f ${CURDIR}/calico.yaml
