@@ -43,7 +43,7 @@ nodes:
       hostPort: 80
       protocol: TCP
     - containerPort: 443
-      hostPort: 443
+      hostPort: 8443
       protocol: TCP
     - containerPort: 30000
       hostPort: 30000
