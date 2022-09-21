@@ -38,6 +38,8 @@ nodes:
       apiServer:
         certSANs:
         - "${DOMAIN}"
+        - "127.0.0.1"
+        - "0.0.0.0"
     extraPortMappings:
     - containerPort: 80
       hostPort: 8080
