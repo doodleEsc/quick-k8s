@@ -18,10 +18,10 @@ fi
 curl -L https://github.com/projectcalico/calico/releases/download/v3.24.1/calicoctl-linux-amd64 -o calicoctl \
 && chmod +x calicoctl
 
-docker cp ${CURDIR}/calicoctl dev-control-plane:/usr/local/bin/calicoctl
-docker cp ${CURDIR}/calicoctl dev-worker:/usr/local/bin/calicoctl
-docker cp ${CURDIR}/calicoctl dev-worker2:/usr/local/bin/calicoctl
-docker cp ${CURDIR}/calicoctl dev-worker3:/usr/local/bin/calicoctl
+podman cp ${CURDIR}/calicoctl dev-control-plane:/usr/local/bin/calicoctl
+podman cp ${CURDIR}/calicoctl dev-worker:/usr/local/bin/calicoctl
+podman cp ${CURDIR}/calicoctl dev-worker2:/usr/local/bin/calicoctl
+# podman cp ${CURDIR}/calicoctl dev-worker3:/usr/local/bin/calicoctl
 
 rm -f ${CURDIR}/calicoctl
 
@@ -70,16 +70,16 @@ spec:
   peerSelector: route-reflector == "true"
 EOF
 
-docker cp ${CURDIR}/bgpconfiguration.yaml dev-control-plane:/root/bgpconfiguration.yaml
-docker cp ${CURDIR}/bgppeer.yaml dev-control-plane:/root/bgppeer.yaml
+podman cp ${CURDIR}/bgpconfiguration.yaml dev-control-plane:/root/bgpconfiguration.yaml
+podman cp ${CURDIR}/bgppeer.yaml dev-control-plane:/root/bgppeer.yaml
 
 echo "Waiting 180 seconds to ensure calico node running"
 sleep 180
 
 kubectl label node dev-control-plane route-reflector=true
 
-docker exec -it dev-control-plane /usr/local/bin/calicoctl create -f /root/bgpconfiguration.yaml
-docker exec -it dev-control-plane /usr/local/bin/calicoctl create -f /root/bgppeer.yaml
+podman exec -it dev-control-plane /usr/local/bin/calicoctl create -f /root/bgpconfiguration.yaml
+podman exec -it dev-control-plane /usr/local/bin/calicoctl create -f /root/bgppeer.yaml
 
 rm -f ${CURDIR}/bgppeer.yaml ${CURDIR}/bgpconfiguration.yaml
 

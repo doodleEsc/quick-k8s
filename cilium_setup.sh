@@ -10,10 +10,10 @@ if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
 curl -L --fail --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 sha256sum --check cilium-linux-${CLI_ARCH}.tar.gz.sha256sum
 tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz ${CURDIR}/
-docker cp ${CURDIR}/cilium dev-control-plane:/usr/local/bin/cilium
-docker cp ${CURDIR}/cilium dev-worker:/usr/local/bin/cilium
-docker cp ${CURDIR}/cilium dev-worker2:/usr/local/bin/cilium
-docker cp ${CURDIR}/cilium dev-worker3:/usr/local/bin/cilium
+podman cp ${CURDIR}/cilium dev-control-plane:/usr/local/bin/cilium
+podman cp ${CURDIR}/cilium dev-worker:/usr/local/bin/cilium
+podman cp ${CURDIR}/cilium dev-worker2:/usr/local/bin/cilium
+# podman cp ${CURDIR}/cilium dev-worker3:/usr/local/bin/cilium
 rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum} cilium
 
 HUBBLE_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/hubble/master/stable.txt)
@@ -22,19 +22,20 @@ if [ "$(uname -m)" = "aarch64" ]; then HUBBLE_ARCH=arm64; fi
 curl -L --fail --remote-name-all https://github.com/cilium/hubble/releases/download/$HUBBLE_VERSION/hubble-linux-${HUBBLE_ARCH}.tar.gz{,.sha256sum}
 sha256sum --check hubble-linux-${HUBBLE_ARCH}.tar.gz.sha256sum
 tar xzvfC hubble-linux-${HUBBLE_ARCH}.tar.gz ${CURDIR}/
-docker cp ${CURDIR}/hubble dev-control-plane:/usr/local/bin/hubble
-docker cp ${CURDIR}/hubble dev-worker:/usr/local/bin/hubble
-docker cp ${CURDIR}/hubble dev-worker2:/usr/local/bin/hubble
-docker cp ${CURDIR}/hubble dev-worker3:/usr/local/bin/hubble
+podman cp ${CURDIR}/hubble dev-control-plane:/usr/local/bin/hubble
+podman cp ${CURDIR}/hubble dev-worker:/usr/local/bin/hubble
+podman cp ${CURDIR}/hubble dev-worker2:/usr/local/bin/hubble
+# podman cp ${CURDIR}/hubble dev-worker3:/usr/local/bin/hubble
 rm hubble-linux-${HUBBLE_ARCH}.tar.gz{,.sha256sum} hubble
 
-KIND_CIDR=$(docker inspect -f '{{(index .IPAM.Config 0).Subnet}}' kind)
+KIND_CIDR=$(podman inspect -f '{{(index .Subnets 1).Subnet}}' kind)
 
 helm repo add cilium https://helm.cilium.io/
 
-helm install cilium cilium/cilium --version 1.12.1 \
+helm install cilium cilium/cilium --version 1.12.2 \
     --namespace kube-system \
     --set tunnel=disabled \
+    --set operator.replicas=1 \
     --set image.pullPolicy=IfNotPresent \
     --set kubeProxyReplacement=strict \
     --set k8sServiceHost=dev-control-plane \
