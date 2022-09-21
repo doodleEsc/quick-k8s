@@ -3,9 +3,10 @@
 set -o errexit
 CURDIR=$(pwd)
 KUBE_PROXY_MODE=${1:-'iptables'}
+DOMAIN=${2:-'cluster.k8s.dev'}
 help() {
     echo "部署kubernetes集群"
-    echo "usage: sudo ./k8s.sh [iptables|ipvs|none]"
+    echo "usage: sudo ./k8s.sh [iptables|ipvs|none] DOMAIN"
     echo "创建时请选择kube-proxy模式，默认为iptables"
 }
 
@@ -32,25 +33,30 @@ nodes:
       nodeRegistration:
         kubeletExtraArgs:
           node-labels: "ingress-ready=true"
-      extraPortMappings:
-      - containerPort: 80
-        hostPort: 80
-        protocol: TCP
-      - containerPort: 443
-        hostPort: 443
-        protocol: TCP
-      - containerPort: 30000
-        hostPort: 30000
-        protocol: TCP
-      - containerPort: 30001
-        hostPort: 30001
-        protocol: TCP
-      - containerPort: 30002
-        hostPort: 30002
-        protocol: TCP
-      - containerPort: 30003
-        hostPort: 30003
-        protocol: TCP
+    - |
+      kind: ClusterConfiguration
+      apiServer:
+        certSANs:
+        - "${DOMAIN}"
+    extraPortMappings:
+    - containerPort: 80
+      hostPort: 80
+      protocol: TCP
+    - containerPort: 443
+      hostPort: 443
+      protocol: TCP
+    - containerPort: 30000
+      hostPort: 30000
+      protocol: TCP
+    - containerPort: 30001
+      hostPort: 30001
+      protocol: TCP
+    - containerPort: 30002
+      hostPort: 30002
+      protocol: TCP
+    - containerPort: 30003
+      hostPort: 30003
+      protocol: TCP
   - role: worker
   - role: worker
   - role: worker
