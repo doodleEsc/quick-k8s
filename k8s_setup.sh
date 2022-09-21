@@ -43,10 +43,10 @@ nodes:
         - "0.0.0.0"
     extraPortMappings:
     - containerPort: 80
-      hostPort: 80
+      hostPort: 8080
       protocol: TCP
     - containerPort: 443
-      hostPort: 443
+      hostPort: 8443
       protocol: TCP
     - containerPort: 30000
       hostPort: 30000
