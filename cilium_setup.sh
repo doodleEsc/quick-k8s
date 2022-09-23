@@ -35,6 +35,7 @@ helm repo add cilium https://helm.cilium.io/
 helm install cilium cilium/cilium --version 1.12.1 \
     --namespace kube-system \
     --set tunnel=disabled \
+    --set operator.replicas=1 \
     --set image.pullPolicy=IfNotPresent \
     --set kubeProxyReplacement=strict \
     --set k8sServiceHost=dev-control-plane \
