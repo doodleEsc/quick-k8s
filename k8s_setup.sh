@@ -4,7 +4,7 @@ set -o errexit
 export KIND_EXPERIMENTAL_PROVIDER=podman
 CURDIR=$(pwd)
 KUBE_PROXY_MODE=${1:-'iptables'}
-DOMAIN=${2:-'cluster.k8s.dev'}
+DOMAIN=${2:-'dev-control-plane'}
 help() {
     echo "部署kubernetes集群"
     echo "usage: sudo ./k8s.sh [iptables|ipvs|none] DOMAIN"
@@ -87,8 +87,17 @@ podman exec -it dev-worker2 /bin/bash -c "mv /cni-plugins/* /opt/cni/bin"
 rm -rf ./cni-plugins
 
 echo ""
-echo "\033[31m!!!NOTE!!!\033[0m"
-echo "if you want to deployment cilium CNI, please mount the bpf filesystem first"
-echo "check more information at: \033[32mhttps://docs.cilium.io/en/v1.9/operations/system_requirements/\033[0m"
-echo "1: \033[33mpodman machine ssh\033[0m"
-echo "2: \033[33msudo mount bpffs /sys/fs/bpf -t bpf\033[0m"
+echo -e "\033[31m!!!NOTE!!!\033[0m"
+echo -e "if you want to deployment cilium CNI, please mount the bpf filesystem first"
+echo -e "check more information at: \033[32mhttps://docs.cilium.io/en/v1.9/operations/system_requirements/\033[0m"
+echo -e "1: \033[33mpodman machine ssh\033[0m"
+echo -e "2: \033[33msudo mount bpffs /sys/fs/bpf -t bpf\033[0m"
+
+sed -i "" "s/https:\/\/.*:6443/https:\/\/127.0.0.1:6443/g" ~/.kube/config
+
+if [[ "$(uname)" == "Darwin" ]];
+then
+    sed -i "" "s/https:\/\/.*:6443/https:\/\/127.0.0.1:6443/g" ~/.kube/config
+else
+    sed -i "s/https:\/\/.*:6443/https:\/\/127.0.0.1:6443/g" ~/.kube/config
+fi
