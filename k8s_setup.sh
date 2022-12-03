@@ -7,7 +7,7 @@ KUBE_PROXY_MODE=${1:-'iptables'}
 DOMAIN=${2:-'dev-control-plane'}
 help() {
     echo "部署kubernetes集群"
-    echo "usage: sudo ./k8s.sh [iptables|ipvs|none] DOMAIN"
+    echo "usage: sudo ./k8s.sh {VERSION|v1.25.4} [iptables|ipvs|none] {DOMAIN|dev-control-plane}"
     echo "创建时请选择kube-proxy模式，默认为iptables"
 }
 
