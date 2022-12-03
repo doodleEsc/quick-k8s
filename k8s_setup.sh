@@ -2,12 +2,12 @@
 
 set -o errexit
 CURDIR=$(pwd)
-VERSION=${1:-'v1.25.4'}
 KUBE_PROXY_MODE=${1:-'iptables'}
-DOMAIN=${2:-'dev-control-plane'}
+VERSION=${2-'v1.25.4'}
+DOMAIN=${3:-'dev-control-plane'}
 help() {
     echo "部署kubernetes集群"
-    echo "usage: sudo ./k8s.sh {VERSION|v1.25.4} [iptables|ipvs|none] {DOMAIN|dev-control-plane}"
+    echo "usage: sudo ./k8s_setup.sh [iptables|ipvs|none] {VERSION|v1.25.4} {DOMAIN|dev-control-plane}"
     echo "创建时请选择kube-proxy模式，默认为iptables"
 }
 
