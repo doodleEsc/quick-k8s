@@ -2,6 +2,7 @@
 
 set -o errexit
 CURDIR=$(pwd)
+VERSION=${1:-'v1.25.4'}
 KUBE_PROXY_MODE=${1:-'iptables'}
 DOMAIN=${2:-'dev-control-plane'}
 help() {
@@ -15,7 +16,7 @@ if [[ "${KUBE_PROXY_MODE}" != "iptables" && "${KUBE_PROXY_MODE}" != "ipvs" && "$
     exit 1
 fi
 
-cat << EOF | kind create cluster --name dev --config=-
+cat << EOF | kind create cluster --name dev --image kindest/node:${VERSION} --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 networking:
