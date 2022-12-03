@@ -3,7 +3,7 @@
 set -o errexit
 CURDIR=$(pwd)
 KUBE_PROXY_MODE=${1:-'iptables'}
-DOMAIN=${2:-'cluster.k8s.dev'}
+DOMAIN=${2:-'dev-control-plane'}
 help() {
     echo "部署kubernetes集群"
     echo "usage: sudo ./k8s.sh [iptables|ipvs|none] DOMAIN"
