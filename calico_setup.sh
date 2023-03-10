@@ -52,7 +52,7 @@ else
     sed -i "s/            #   value: \"192.168.0.0\/16\"/              value: \"${ip}\/${mask}\"/g" calico.yaml
 fi
 
-if [[ "$MODE" == "rr" ]]; then
+if [[ "$CALICO_MODE" == "rr" ]]; then
     if [[ "$(uname)" == "Darwin" ]];
     then
         sed -i "" "s/              value: \"Always\"/              value: \"Never\"/g" calico.yaml
@@ -63,7 +63,7 @@ fi
 
 kubectl apply -f ${CURDIR}/calico.yaml
 
-if [[ "$MODE" == "rr" ]]; then
+if [[ "$CALICO_MODE" == "rr" ]]; then
 
 cat << 'EOF' >> bgpconfiguration.yaml
 apiVersion: projectcalico.org/v3
