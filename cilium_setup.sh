@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -o errexit
-
+source config
 CURDIR=$(pwd)
 
 CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/master/stable.txt)
@@ -32,7 +32,8 @@ KIND_CIDR=$(docker inspect -f '{{(index .IPAM.Config 0).Subnet}}' kind)
 
 helm repo add cilium https://helm.cilium.io/
 
-helm install cilium cilium/cilium --version 1.12.1 \
+CILIUM_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium/master/stable.txt)
+helm install cilium cilium/cilium --version ${CILIUM_VERSION} \
     --namespace kube-system \
     --set tunnel=disabled \
     --set operator.replicas=1 \
@@ -44,7 +45,7 @@ helm install cilium cilium/cilium --version 1.12.1 \
     --set autoDirectNodeRoutes=true \
     --set ipv4NativeRoutingCIDR=${KIND_CIDR} \
     --set ipam.mode=kubernetes \
-    --set ipam.operator.clusterPoolIPv4PodCIDR=10.244.0.0/16 \
+    --set ipam.operator.clusterPoolIPv4PodCIDR=$K8S_PODSUBNET \
     --set cgroup.hostRoot=/sys/fs/cgroup \
     --set nodePort.enabled=true \
     --set socketLB.enabled=true \

@@ -1,31 +1,32 @@
 #!/bin/bash
 
 set -o errexit
+source config
 CURDIR=$(pwd)
-KUBE_PROXY_MODE=${1:-'iptables'}
-VERSION=${2-'v1.25.4'}
-DOMAIN=${3:-'dev-control-plane'}
-help() {
-    echo "部署kubernetes集群"
-    echo "usage: sudo ./k8s_setup.sh [iptables|ipvs|none] {VERSION|v1.25.4} {DOMAIN|dev-control-plane}"
-    echo "创建时请选择kube-proxy模式，默认为iptables"
-}
+# KUBE_PROXY_MODE=${1:-'iptables'}
+# VERSION=${2-'v1.25.4'}
+# DOMAIN=${3:-'dev-control-plane'}
+# help() {
+#     echo "部署kubernetes集群"
+#     echo "usage: sudo ./k8s_setup.sh [iptables|ipvs|none] {VERSION|v1.25.4} {DOMAIN|dev-control-plane}"
+#     echo "创建时请选择kube-proxy模式，默认为iptables"
+# }
+#
+# if [[ "$KUBE_PROXY_MODE" != "iptables" && "$KUBE_PROXY_MODE" != "ipvs" && "$KUBE_PROXY_MODE" != "none" ]]; then
+#     help
+#     exit 1
+# fi
 
-if [[ "${KUBE_PROXY_MODE}" != "iptables" && "${KUBE_PROXY_MODE}" != "ipvs" && "${KUBE_PROXY_MODE}" != "none" ]]; then
-    help
-    exit 1
-fi
-
-cat << EOF | kind create cluster --name dev --image kindest/node:${VERSION} --config=-
+cat << EOF | kind create cluster --name dev --image kindest/node:$K8S_VERSION --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 networking:
   apiServerAddress: "0.0.0.0"
   apiServerPort: 6443
-  podSubnet: "10.244.0.0/16"
-  serviceSubnet: "10.96.0.0/16"
+  podSubnet: "$K8S_PODSUBNET"
+  serviceSubnet: "$K8S_SVCSUBNET"
   disableDefaultCNI: true
-  kubeProxyMode: "${KUBE_PROXY_MODE}"
+  kubeProxyMode: "$KUBE_PROXY_MODE"
 nodes:
   - role: control-plane
     kubeadmConfigPatches:
@@ -38,7 +39,7 @@ nodes:
       kind: ClusterConfiguration
       apiServer:
         certSANs:
-        - "${DOMAIN}"
+        - "$K8S_API_DOMAIN"
         - "127.0.0.1"
         - "0.0.0.0"
     extraPortMappings:
@@ -65,10 +66,12 @@ nodes:
   - role: worker
 EOF
 
-sleep 10
+sleep 20
+
+CNI_PLUGINS_VERSION=$(curl --silent "https://api.github.com/repos/containernetworking/plugins/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
 mkdir cni-plugins \
-&& wget -O ./cni-plugins/cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/v1.1.1/cni-plugins-linux-amd64-v1.1.1.tgz \
+&& wget -O ./cni-plugins/cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/${CNI_PLUGINS_VERSION}/cni-plugins-linux-amd64-${CNI_PLUGINS_VERSION}.tgz \
 && tar xf ./cni-plugins/cni-plugins.tgz -C ./cni-plugins \
 && rm -f ./cni-plugins/cni-plugins.tgz
 
