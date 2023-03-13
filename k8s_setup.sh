@@ -68,23 +68,29 @@ EOF
 
 sleep 20
 
-CNI_PLUGINS_VERSION=$(curl --silent "https://api.github.com/repos/containernetworking/plugins/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
-mkdir cni-plugins \
-&& wget -O ./cni-plugins/cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/${CNI_PLUGINS_VERSION}/cni-plugins-linux-amd64-${CNI_PLUGINS_VERSION}.tgz \
-&& tar xf ./cni-plugins/cni-plugins.tgz -C ./cni-plugins \
-&& rm -f ./cni-plugins/cni-plugins.tgz
 
-docker cp ./cni-plugins dev-control-plane:/cni-plugins
-docker exec -it dev-control-plane /bin/bash -c "mv /cni-plugins/* /opt/cni/bin"
+if [[ "$CNI_PLUGINS_INSTALL" == "enable" ]];
+then
+    CNI_PLUGINS_VERSION=$(curl --silent "https://api.github.com/repos/containernetworking/plugins/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
-docker cp ./cni-plugins dev-worker:/cni-plugins
-docker exec -it dev-worker /bin/bash -c "mv /cni-plugins/* /opt/cni/bin"
+    mkdir cni-plugins \
+    && wget -O ./cni-plugins/cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/${CNI_PLUGINS_VERSION}/cni-plugins-linux-amd64-${CNI_PLUGINS_VERSION}.tgz \
+    && tar xf ./cni-plugins/cni-plugins.tgz -C ./cni-plugins \
+    && rm -f ./cni-plugins/cni-plugins.tgz
 
-docker cp ./cni-plugins dev-worker2:/cni-plugins
-docker exec -it dev-worker2 /bin/bash -c "mv /cni-plugins/* /opt/cni/bin"
+    docker cp ./cni-plugins dev-control-plane:/cni-plugins
+    docker exec -it dev-control-plane /bin/bash -c "mv /cni-plugins/* /opt/cni/bin"
 
-docker cp ./cni-plugins dev-worker3:/cni-plugins
-docker exec -it dev-worker3 /bin/bash -c "mv /cni-plugins/* /opt/cni/bin"
+    docker cp ./cni-plugins dev-worker:/cni-plugins
+    docker exec -it dev-worker /bin/bash -c "mv /cni-plugins/* /opt/cni/bin"
 
-rm -rf ./cni-plugins
+    docker cp ./cni-plugins dev-worker2:/cni-plugins
+    docker exec -it dev-worker2 /bin/bash -c "mv /cni-plugins/* /opt/cni/bin"
+
+    docker cp ./cni-plugins dev-worker3:/cni-plugins
+    docker exec -it dev-worker3 /bin/bash -c "mv /cni-plugins/* /opt/cni/bin"
+
+    rm -rf ./cni-plugins
+fi
+
