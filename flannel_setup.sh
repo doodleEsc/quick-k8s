@@ -22,3 +22,4 @@ else
 fi
 
 kubectl apply -f kube-flannel.yml
+rm -f kube-flannel.yml
